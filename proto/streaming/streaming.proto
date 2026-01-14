@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package streaming;
+
+option go_package = "github.com/datmedevil17/micro-flex/proto/streaming";
+
+
+service StreamingService {
+  rpc GetStreamingURL(GetStreamingURLRequest) returns (GetStreamingURLResponse);
+  rpc ValidateStreamAccess(ValidateStreamAccessRequest) returns (ValidateStreamAccessResponse);
+}
+
+message GetStreamingURLRequest {
+  string movie_id = 1;
+  string user_id = 2;
+  int32 quality = 3; // 360, 480, 720, 1080
+}
+
+message GetStreamingURLResponse {
+  string streaming_url = 1;
+  int32 expires_in = 2; // seconds
+  string message = 3;
+}
+
+message ValidateStreamAccessRequest {
+  string user_id = 1;
+  string movie_id = 2;
+}
+
+message ValidateStreamAccessResponse {
+  bool has_access = 1;
+  string message = 2;
+}

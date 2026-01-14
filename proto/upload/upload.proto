@@ -1,0 +1,57 @@
+syntax = "proto3";
+
+package upload;
+
+option go_package = "github.com/datmedevil17/micro-flex/proto/upload";
+
+service UploadService {
+  rpc UploadVideo(UploadVideoRequest) returns (UploadVideoResponse);
+  rpc UploadThumbnail(UploadThumbnailRequest) returns (UploadThumbnailResponse);
+  rpc UploadAvatar(UploadAvatarRequest) returns (UploadAvatarResponse);
+  rpc DeleteFile(DeleteFileRequest) returns (DeleteFileResponse);
+}
+
+message UploadVideoRequest {
+  bytes file_data = 1;
+  string file_name = 2;
+  string movie_id = 3;
+}
+
+message UploadVideoResponse {
+  string url = 1;
+  string public_id = 2;
+  string message = 3;
+}
+
+message UploadThumbnailRequest {
+  bytes file_data = 1;
+  string file_name = 2;
+  string movie_id = 3;
+}
+
+message UploadThumbnailResponse {
+  string url = 1;
+  string public_id = 2;
+  string message = 3;
+}
+
+message UploadAvatarRequest {
+  bytes file_data = 1;
+  string file_name = 2;
+  string user_id = 3;
+}
+
+message UploadAvatarResponse {
+  string url = 1;
+  string public_id = 2;
+  string message = 3;
+}
+
+message DeleteFileRequest {
+  string public_id = 1;
+  string resource_type = 2; // video, image, raw
+}
+
+message DeleteFileResponse {
+  string message = 1;
+}

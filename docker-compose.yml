@@ -1,75 +1,172 @@
-version: '3.8'
-
 services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: netflix-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: netflix
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - netflix-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: netflix-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - netflix-network
+
+  auth-service:
+    build:
+      context: .
+      dockerfile: services/auth/docker/Dockerfile
+    container_name: netflix-auth-service
+    ports:
+      - "50051:50051"
+    depends_on:
+      - postgres
+    environment:
+      - DATABASE_HOST=postgres
+      - DATABASE_PORT=5432
+      - DATABASE_USER=postgres
+      - DATABASE_PASSWORD=postgres
+      - DATABASE_NAME=netflix
+    networks:
+      - netflix-network
+    restart: unless-stopped
+
+  user-service:
+    build:
+      context: .
+      dockerfile: services/user/docker/Dockerfile
+    container_name: netflix-user-service
+    ports:
+      - "50052:50052"
+    depends_on:
+      - postgres
+    environment:
+      - DATABASE_HOST=postgres
+      - DATABASE_PORT=5432
+      - DATABASE_USER=postgres
+      - DATABASE_PASSWORD=postgres
+      - DATABASE_NAME=netflix
+    networks:
+      - netflix-network
+    restart: unless-stopped
+
+  movie-service:
+    build:
+      context: .
+      dockerfile: services/movie/docker/Dockerfile
+    container_name: netflix-movie-service
+    ports:
+      - "50053:50053"
+    depends_on:
+      - postgres
+    environment:
+      - DATABASE_HOST=postgres
+      - DATABASE_PORT=5432
+      - DATABASE_USER=postgres
+      - DATABASE_PASSWORD=postgres
+      - DATABASE_NAME=netflix
+    networks:
+      - netflix-network
+    restart: unless-stopped
+
+  upload-service:
+    build:
+      context: .
+      dockerfile: services/upload/docker/Dockerfile
+    container_name: netflix-upload-service
+    ports:
+      - "50054:50054"
+    environment:
+      - CLOUDINARY_CLOUD_NAME=${CLOUDINARY_CLOUD_NAME}
+      - CLOUDINARY_API_KEY=${CLOUDINARY_API_KEY}
+      - CLOUDINARY_API_KEY=${CLOUDINARY_API_KEY}
+      - CLOUDINARY_API_SECRET=${CLOUDINARY_API_SECRET}
+      - DATABASE_HOST=postgres
+      - DATABASE_PORT=5432
+      - DATABASE_USER=postgres
+      - DATABASE_PASSWORD=postgres
+      - DATABASE_NAME=netflix
+    networks:
+      - netflix-network
+    restart: unless-stopped
+
+  streaming-service:
+    build:
+      context: .
+      dockerfile: services/streaming/docker/Dockerfile
+    container_name: netflix-streaming-service
+    ports:
+      - "50055:50055"
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      - DATABASE_HOST=postgres
+      - DATABASE_PORT=5432
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    networks:
+      - netflix-network
+    restart: unless-stopped
+
+  recommendation-service:
+    build:
+      context: .
+      dockerfile: services/recommendation/docker/Dockerfile
+    container_name: netflix-recommendation-service
+    ports:
+      - "50056:50056"
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      - DATABASE_HOST=postgres
+      - DATABASE_PORT=5432
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    networks:
+      - netflix-network
+    restart: unless-stopped
+
+
   api-gateway:
     build:
       context: .
-      dockerfile: Dockerfile
-    command: ["/app/api-gateway"]
+      dockerfile: api-gateway/docker/Dockerfile
+    container_name: netflix-api-gateway
     ports:
       - "8080:8080"
     depends_on:
       - auth-service
       - user-service
+      - movie-service
+      - upload-service
+      - streaming-service
+      - recommendation-service
+    environment:
+      - SERVICES_AUTH_URL=auth-service:50051
+      - SERVICES_USER_URL=user-service:50052
+      - SERVICES_MOVIE_URL=movie-service:50053
+      - SERVICES_UPLOAD_URL=upload-service:50054
+      - SERVICES_STREAMING_URL=streaming-service:50055
+      - SERVICES_RECOMMENDATION_URL=recommendation-service:50056
+    networks:
+      - netflix-network
+    restart: unless-stopped
 
-  auth-service:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    command: ["/app/auth-service"]
-    ports:
-      - "8081:8081"
-      - "50051:50051"
+volumes:
+  postgres_data:
 
-  user-service:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    command: ["/app/user-service"]
-    ports:
-      - "8082:8082"
-      - "50052:50052"
-
-  movie-service:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    command: ["/app/movie-service"]
-    ports:
-      - "8083:8083"
-      - "50053:50053"
-
-  upload-service:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    command: ["/app/upload-service"]
-    ports:
-      - "8084:8084"
-      - "50054:50054"
-
-  streaming-service:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    command: ["/app/streaming-service"]
-    ports:
-      - "8085:8085"
-      
-  recommendation-service:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    command: ["/app/recommendation-service"]
-    ports:
-      - "8086:8086"
-      - "50056:50056"
-
-  notification-service:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    command: ["/app/notification-service"]
-    ports:
-      - "8087:8087"
-      - "50057:50057"
+networks:
+  netflix-network:
+    driver: bridge

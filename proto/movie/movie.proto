@@ -1,0 +1,115 @@
+syntax = "proto3";
+
+package movie;
+
+option go_package = "github.com/datmedevil17/micro-flex/proto/movie";
+
+service MovieService {
+  rpc CreateMovie(CreateMovieRequest) returns (CreateMovieResponse);
+  rpc GetMovie(GetMovieRequest) returns (GetMovieResponse);
+  rpc ListMovies(ListMoviesRequest) returns (ListMoviesResponse);
+  rpc UpdateMovie(UpdateMovieRequest) returns (UpdateMovieResponse);
+  rpc DeleteMovie(DeleteMovieRequest) returns (DeleteMovieResponse);
+  rpc SearchMovies(SearchMoviesRequest) returns (SearchMoviesResponse);
+  rpc GetMoviesByGenre(GetMoviesByGenreRequest) returns (GetMoviesByGenreResponse);
+}
+
+message Movie {
+  string id = 1;
+  string title = 2;
+  string description = 3;
+  string thumbnail_url = 4;
+  string video_url = 5;
+  int32 duration = 6;
+  string genre = 7;
+  double rating = 8;
+  int32 release_year = 9;
+  string director = 10;
+  repeated string cast = 11;
+  string created_at = 12;
+  string updated_at = 13;
+}
+
+message CreateMovieRequest {
+  string title = 1;
+  string description = 2;
+  string thumbnail_url = 3;
+  string video_url = 4;
+  int32 duration = 5;
+  string genre = 6;
+  int32 release_year = 7;
+  string director = 8;
+  repeated string cast = 9;
+}
+
+message CreateMovieResponse {
+  Movie movie = 1;
+  string message = 2;
+}
+
+message GetMovieRequest {
+  string id = 1;
+}
+
+message GetMovieResponse {
+  Movie movie = 1;
+}
+
+message ListMoviesRequest {
+  int32 limit = 1;
+  int32 offset = 2;
+}
+
+message ListMoviesResponse {
+  repeated Movie movies = 1;
+  int32 total = 2;
+}
+
+message UpdateMovieRequest {
+  string id = 1;
+  string title = 2;
+  string description = 3;
+  string thumbnail_url = 4;
+  string video_url = 5;
+  int32 duration = 6;
+  string genre = 7;
+  double rating = 8;
+  int32 release_year = 9;
+  string director = 10;
+  repeated string cast = 11;
+}
+
+message UpdateMovieResponse {
+  Movie movie = 1;
+  string message = 2;
+}
+
+message DeleteMovieRequest {
+  string id = 1;
+}
+
+message DeleteMovieResponse {
+  string message = 1;
+}
+
+message SearchMoviesRequest {
+  string query = 1;
+  int32 limit = 2;
+  int32 offset = 3;
+}
+
+message SearchMoviesResponse {
+  repeated Movie movies = 1;
+  int32 total = 2;
+}
+
+message GetMoviesByGenreRequest {
+  string genre = 1;
+  int32 limit = 2;
+  int32 offset = 3;
+}
+
+message GetMoviesByGenreResponse {
+  repeated Movie movies = 1;
+  int32 total = 2;
+}

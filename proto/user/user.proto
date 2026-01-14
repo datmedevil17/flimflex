@@ -1,0 +1,105 @@
+syntax = "proto3";
+
+package user;
+
+option go_package = "github.com/datmedevil17/micro-flex/proto/user";
+
+service UserService {
+  rpc GetProfile(GetProfileRequest) returns (GetProfileResponse);
+  rpc UpdateProfile(UpdateProfileRequest) returns (UpdateProfileResponse);
+  rpc GetWatchHistory(GetWatchHistoryRequest) returns (GetWatchHistoryResponse);
+  rpc AddToWatchHistory(AddToWatchHistoryRequest) returns (AddToWatchHistoryResponse);
+  rpc GetWatchlist(GetWatchlistRequest) returns (GetWatchlistResponse);
+  rpc AddToWatchlist(AddToWatchlistRequest) returns (AddToWatchlistResponse);
+  rpc RemoveFromWatchlist(RemoveFromWatchlistRequest) returns (RemoveFromWatchlistResponse);
+}
+
+message GetProfileRequest {
+  string user_id = 1;
+}
+
+message Profile {
+  string user_id = 1;
+  string email = 2;
+  string full_name = 3;
+  string avatar_url = 4;
+  string subscription_plan = 5;
+  string created_at = 6;
+}
+
+message GetProfileResponse {
+  Profile profile = 1;
+}
+
+message UpdateProfileRequest {
+  string user_id = 1;
+  string full_name = 2;
+  string avatar_url = 3;
+}
+
+message UpdateProfileResponse {
+  Profile profile = 1;
+  string message = 2;
+}
+
+message GetWatchHistoryRequest {
+  string user_id = 1;
+  int32 limit = 2;
+  int32 offset = 3;
+}
+
+message WatchHistory {
+  string id = 1;
+  string user_id = 2;
+  string movie_id = 3;
+  int32 watch_duration = 4;
+  string watched_at = 5;
+}
+
+message GetWatchHistoryResponse {
+  repeated WatchHistory items = 1;
+  int32 total = 2;
+}
+
+message AddToWatchHistoryRequest {
+  string user_id = 1;
+  string movie_id = 2;
+  int32 watch_duration = 3;
+}
+
+message AddToWatchHistoryResponse {
+  string message = 1;
+}
+
+message GetWatchlistRequest {
+  string user_id = 1;
+}
+
+message Watchlist {
+  string id = 1;
+  string user_id = 2;
+  string movie_id = 3;
+  string added_at = 4;
+}
+
+message GetWatchlistResponse {
+  repeated Watchlist items = 1;
+}
+
+message AddToWatchlistRequest {
+  string user_id = 1;
+  string movie_id = 2;
+}
+
+message AddToWatchlistResponse {
+  string message = 1;
+}
+
+message RemoveFromWatchlistRequest {
+  string user_id = 1;
+  string movie_id = 2;
+}
+
+message RemoveFromWatchlistResponse {
+  string message = 1;
+}

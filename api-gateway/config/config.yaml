@@ -1,0 +1,15 @@
+server:
+  port: "8080"
+  env: "development"
+
+services:
+  auth_url: "127.0.0.1:50051"
+  user_url: "127.0.0.1:50052"
+  movie_url: "127.0.0.1:50053"
+  upload_url: "127.0.0.1:50054"
+  streaming_url: "127.0.0.1:50055"
+  recommendation_url: "127.0.0.1:50056"
+  notification_url: "127.0.0.1:50057"
+
+jwt:
+  secret_key: "your-super-secret-jwt-key-change-in-production"

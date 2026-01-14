@@ -1,0 +1,19 @@
+server:
+  port: "50056"
+  env: "development"
+
+database:
+  host: "localhost"
+  port: "5432"
+  user: "postgres"
+  password: "postgres"
+  dbname: "netflix"
+  sslmode: "disable"
+
+redis:
+  host: "localhost"
+  port: "6379"
+  db: 0
+
+gemini:
+  api_key: "${GEMINI_API_KEY}"
